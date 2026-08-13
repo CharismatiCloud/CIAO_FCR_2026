@@ -56,6 +56,7 @@ OBSERVE: o numero de rotas cresce como (n-1)! (fatorial)
 
 
 lab03_aula02
+
 Rodando 20 instancias...
 Instancia  1 | Otimo:  199 | Gulosa:  199 | Gap:   0.0%
 Instancia  2 | Otimo:  170 | Gulosa:  170 | Gap:   0.0%
