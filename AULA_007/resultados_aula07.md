@@ -98,3 +98,23 @@ O parâmetro de inércia `w` controla o quanto da velocidade da iteração anter
 - É comum usar um `w` que decai ao longo das iterações (começando alto e diminuindo), combinando boa exploração inicial com refinamento posterior, o que ajuda o algoritmo a convergir para o mínimo global sem ficar preso a mínimos locais nem oscilar indefinidamente.
 
 No código deste laboratório, `w = 0.5` é um valor fixo intermediário, equilibrando moderadamente inércia e resposta ao pbest/gbest ao longo de todas as 15 iterações.
+
+[Lab05]
+# LAB 05 — MEMÉTICO: Meta-heurística + Busca Local
+
+[LAB 05] Solução Inicial: [ 2.5 -3.1] | Fitness: 37.7698
+[LAB 05] Solução Refinada: [ 2.5 -3.1] | Fitness: 37.7698
+
+## Questão 1
+
+A diferença fundamental é que o Algoritmo Genético Puro utiliza principalmente operadores evolutivos, como seleção, crossover e mutação, para explorar o espaço de soluções.
+
+Já o Algoritmo Memético combina esses operadores com uma busca local. Depois de gerar uma solução, o algoritmo tenta melhorá-la individualmente por meio de pequenas alterações. Dessa forma, o Algoritmo Memético realiza tanto exploração do espaço de busca quanto intensificação das soluções encontradas.
+
+## Questão 2
+
+Executar a busca local sobre todos os indivíduos a cada geração aumenta significativamente o custo computacional.
+
+Isso acontece porque, além das operações normais do algoritmo evolutivo, cada indivíduo precisa realizar várias avaliações de vizinhança. Por exemplo, com uma população de 100 indivíduos, 50 gerações e 20 passos de busca local por indivíduo, podem ser necessárias até 100.000 avaliações adicionais da função objetivo.
+
+O benefício é que as soluções podem ser refinadas mais rapidamente, mas o tempo de execução e o número de avaliações aumentam proporcionalmente.
