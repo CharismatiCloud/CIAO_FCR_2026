@@ -51,3 +51,50 @@ A penalização do fitness é fundamental porque impede que soluções que ultra
 Quando o peso total é maior que `max_weight`, o fitness recebe valor 0. Dessa forma, soluções inválidas têm pouca ou nenhuma chance de serem selecionadas para reprodução.
 
 Isso faz com que, ao longo das gerações, o algoritmo favoreça indivíduos que respeitam a restrição de peso enquanto procuram maximizar o valor dos ativos.
+
+# LAB 03 - PSO: Inércia, Componente Cognitiva e Social
+
+**Tema:** Otimização Contínua de Parâmetros e Limiares.
+
+## Equação implementada
+
+A linha desbalanceada foi completada com a equação clássica de atualização de velocidade do PSO:
+
+```python
+V[i] = (w * V[i]) + (c1 * r1 * (pbest_X[i] - X[i])) + (c2 * r2 * (gbest_X - X[i]))
+```
+
+Onde:
+- `w * V[i]` é o termo de **inércia** (mantém a direção/velocidade anterior);
+- `c1 * r1 * (pbest_X[i] - X[i])` é o termo **cognitivo** (atrai a partícula de volta à sua própria melhor posição já encontrada);
+- `c2 * r2 * (gbest_X - X[i])` é o termo **social** (atrai a partícula em direção à melhor posição encontrada por todo o enxame).
+
+## Output da execução
+
+```
+[LAB 03] Melhor posição encontrada pelo Enxame (gbest): [-0.01309447 -0.02659493]
+[LAB 03] Fitness da melhor posição (gbest): 0.0008787551443636512
+```
+
+(Executado com `np.random.seed(42)` para reprodutibilidade. O algoritmo convergiu, como esperado, para próximo do mínimo global da função esférica em (0, 0).)
+
+## Respostas das Questões Técnicas
+
+### 1 - O que acontece com o comportamento das partículas se zerarmos a componente cognitiva (c1 = 0)?
+
+Ao zerar `c1`, o termo `c1 * r1 * (pbest_X[i] - X[i])` desaparece da equação de velocidade, ou seja, a partícula deixa de ser atraída pela sua própria melhor posição individual (pbest). Ela passa a se mover apenas com base na inércia (velocidade anterior) e na componente social (atração pelo gbest, a melhor posição global do enxame).
+
+Na prática, isso faz com que:
+- Todas as partículas convirjam de forma mais rápida e homogênea em direção ao gbest, já que não há mais um "puxão" individual concorrente;
+- O enxame perde diversidade de busca mais cedo, aumentando o risco de **convergência prematura** para um mínimo local (caso a função de fitness tenha múltiplos mínimos), pois as partículas deixam de explorar regiões próprias e passam a seguir quase que exclusivamente o líder do grupo;
+- O algoritmo se aproxima de um comportamento mais "gregário"/social puro, sacrificando a capacidade de exploração individual em favor da exploração coletiva (explotação em torno do gbest).
+
+### 2 - Qual a função do parâmetro de Inércia (w) na busca por mínimos globais?
+
+O parâmetro de inércia `w` controla o quanto da velocidade da iteração anterior é preservado na atualização da velocidade atual. Ele regula o equilíbrio entre **exploração (exploration)** e **explotação/refinamento (exploitation)**:
+
+- **Valores altos de w** (próximos de 1 ou maiores) fazem a partícula manter grande parte do seu movimento anterior, favorecendo a exploração do espaço de busca — útil no início da otimização para varrer regiões distantes e evitar ficar presa prematuramente em mínimos locais;
+- **Valores baixos de w** (próximos de 0) reduzem a influência da velocidade anterior, fazendo a partícula responder mais fortemente aos termos cognitivo e social, favorecendo a explotação — refinar a busca em torno das melhores posições já encontradas (pbest/gbest), útil nas fases finais para convergir com precisão;
+- É comum usar um `w` que decai ao longo das iterações (começando alto e diminuindo), combinando boa exploração inicial com refinamento posterior, o que ajuda o algoritmo a convergir para o mínimo global sem ficar preso a mínimos locais nem oscilar indefinidamente.
+
+No código deste laboratório, `w = 0.5` é um valor fixo intermediário, equilibrando moderadamente inércia e resposta ao pbest/gbest ao longo de todas as 15 iterações.
