@@ -99,6 +99,60 @@ O parâmetro de inércia `w` controla o quanto da velocidade da iteração anter
 
 No código deste laboratório, `w = 0.5` é um valor fixo intermediário, equilibrando moderadamente inércia e resposta ao pbest/gbest ao longo de todas as 15 iterações.
 
+LAB 04 - ACO: Feromônio, Evaporação e Atratividade
+
+Tema: Otimização de Caminhos e Grafos de Rede.
+
+Observação: o enunciado original trazia duas perguntas coladas no item "2" (sem separação de texto). Elas foram desmembradas abaixo nas questões 2 e 3 para que ambas fossem respondidas integralmente.
+
+Trechos implementados
+python
+# TODO 1: Evaporação em toda a matriz de feromônio
+pheromone_matrix = (1 - rho) * pheromone_matrix
+
+# TODO 2: Depósito de feromônio em cada aresta percorrida, inversamente proporcional ao custo do caminho
+for path, cost in zip(paths, costs):
+    for i in range(len(path) - 1):
+        u, v = path[i], path[i + 1]
+        pheromone_matrix[u][v] += 1.0 / cost
+
+Também foi incluído o cálculo da atratividade inicial (eta), definida como o inverso da latência de cada enlace (eta = 1 / latência), para responder à questão 3.
+
+Output da execução
+[LAB 04] Matriz de Feromônio Atualizada:
+ [[0.75       0.91666667 0.91666667 0.75      ]
+ [0.75       0.75       0.75       1.08333333]
+ [0.75       0.91666667 0.75       0.75      ]
+ [0.75       0.75       0.75       0.75      ]]
+
+[LAB 04] Matriz de Atratividade Inicial (eta = 1/latência):
+ [[0.         0.2        0.5        0.11111111]
+ [0.2        0.         0.33333333 1.        ]
+ [0.5        0.33333333 0.         0.14285714]
+ [0.11111111 1.         0.14285714 0.        ]]
+Respostas das Questões Técnicas
+1 - Por que a evaporação do feromônio é necessária no algoritmo ACO?
+
+A evaporação (representada pelo fator (1 - rho) aplicado a toda a matriz de feromônio) reduz gradualmente a intensidade do feromônio depositado em todas as arestas do grafo ao longo das iterações. Ela é necessária porque:
+
+Evita que o algoritmo fique preso permanentemente em caminhos encontrados nas primeiras iterações, mesmo que eles não sejam os melhores — sem evaporação, o feromônio depositado só cresce, "engessando" a preferência do enxame por rotas subótimas descobertas cedo;
+Introduz um mecanismo de "esquecimento" que dá espaço para que caminhos melhores, descobertos mais tarde, possam competir e se tornar dominantes;
+Ajuda a manter o equilíbrio entre exploração (busca de novas rotas) e explotação (reforço das rotas já boas), algo essencial para a convergência do algoritmo para o ótimo global (ou uma boa aproximação dele).
+2 - O que ocorreria em grafos complexos sem ela?
+
+Sem evaporação, em grafos mais complexos (com muitos nós e arestas, e múltiplos caminhos possíveis) o algoritmo tenderia a:
+
+Sofrer convergência prematura/estagnação: as primeiras arestas que recebem depósito de feromônio acumulam vantagem permanente, e como o feromônio nunca decai, essa vantagem só aumenta a cada iteração, tornando extremamente improvável que as formigas explorem novas rotas alternativas;
+Ficar preso em mínimos locais, já que o algoritmo perde a capacidade de "corrigir o rumo" quando encontra, mais tarde, um caminho de menor custo total do que aquele que foi reforçado inicialmente;
+Apresentar falta de diversidade nas soluções exploradas pelo enxame, reduzindo a qualidade geral da otimização à medida que o grafo cresce em tamanho e número de caminhos possíveis, pois o espaço de busca não é varrido de forma adequada.
+3 - Qual a relação matemática entre a latência de um enlace e sua atratividade inicial (eta) para as formigas?
+
+A atratividade inicial de um enlace, comumente chamada de eta (η), é definida como o inverso da latência (custo) daquele enlace:
+
+eta(u, v) = 1 / latência(u, v)
+
+Ou seja, a relação é inversamente proporcional: quanto menor a latência entre dois roteadores, maior a atratividade heurística daquele enlace, tornando-o mais provável de ser escolhido por uma formiga na regra de decisão probabilística do ACO (que combina eta com a intensidade do feromônio, tipicamente na forma feromônio^α * eta^β). Enlaces com alta latência (custo alto) recebem, portanto, atratividade inicial baixa, desestimulando — mas não impedindo — seu uso pelas formigas.
+
 [Lab05]
 # LAB 05 — MEMÉTICO: Meta-heurística + Busca Local
 
